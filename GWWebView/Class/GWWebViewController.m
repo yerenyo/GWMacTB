@@ -7,8 +7,12 @@
 //
 
 #import "GWWebViewController.h"
+@interface GWWebViewController()
 
+@end
 @implementation GWWebViewController
+
+
 - (void)awakeFromNib{
     /* set ourself to the app's delegate so our
      applicationShouldTerminateAfterLastWindowClosed
@@ -52,7 +56,7 @@
     [_webView stringByEvaluatingJavaScriptFromString:@"myFunction();"];
 }
 - (void)onFinder:(NSButton *)sender{
-
+    
 }
 
     
@@ -61,7 +65,7 @@
      "script.type = 'text/javascript';"
      "script.text = \"function myFunction1() { "
      "var field = document.getElementsByClassName('page-next');"
-     "field.onclick();"
+     "field[0].submit();"
      "}\";"
      "document.getElementsByTagName('head')[0].appendChild(script);"];
     [_webView stringByEvaluatingJavaScriptFromString:@"myFunction1();"];
@@ -73,8 +77,67 @@
 }
 
 
-- (NSURLRequest *)webView:(WebView *)webView resource:(id)identifier willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse fromDataSource:(WebDataSource *)dataSource {
-    NSLog(@"%@", request);
-    return request;
+//- (NSURLRequest *)webView:(WebView *)webView resource:(id)identifier willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse fromDataSource:(WebDataSource *)dataSource {
+//    NSLog(@"%@", request);
+//    return request;
+//}
+
+#pragma mark - webkit 方法用于js 回调oc方法
+//用于js调用oc方法时判断
++ (BOOL)isSelectorExcludedFromWebScript:(SEL)selector {
+//    if (selector == @selector(doOutputToLog:)
+//        || selector == @selector(changeJavaScriptText:)
+//        || selector == @selector(reportSharedValue)) {
+//        return NO;
+//    }
+    return YES;
 }
+//用于js调用oc属性时判断
++ (BOOL)isKeyExcludedFromWebScript:(const char *)property {
+	NSLog(@"%@ received %@ for '%s'", self, NSStringFromSelector(_cmd), property);
+	if (strcmp(property, "sharedValue") == 0) {
+        return NO;
+    }
+    return YES;
+}
+//绑定oc方法与js调用oc对象方法名
++ (NSString *) webScriptNameForSelector:(SEL)sel {
+//    if (sel == @selector(doOutputToLog:)) {
+		return @"log";
+//    } else if (sel == @selector(changeJavaScriptText:)) {
+		return @"setscript";
+//	} else {
+		return nil;
+//	}
+}
+
+
+//webview load成后 才可以调用 js
+- (void)webView:(WebView *)webView windowScriptObjectAvailable:(WebScriptObject *)windowScriptObject {
+	NSLog(@"%@ received %@", self, NSStringFromSelector(_cmd));
+    
+    /* here we'll add our object to the window object as an object named
+     'console'.  We can use this object in JavaScript by referencing the 'console'
+     property of the 'window' object.   */
+    [windowScriptObject setValue:self forKey:@"console"];
+    
+}
+
+/* sent to the WebView's ui delegate when alert() is called in JavaScript.
+ If you call alert() in your JavaScript methods, it will call this
+ method and display the alert message in the log.  In Safari, this method
+ displays an alert that presents the message to the user.
+ */
+- (void)webView:(WebView *)sender runJavaScriptAlertPanelWithMessage:(NSString *)message {
+	NSLog(@"%@ received %@ with '%@'", self, NSStringFromSelector(_cmd), message);
+}
+
+#pragma mark - js调用 oc方法
+- (void)nextpage:(NSString *)urlString{
+    if (urlString && urlString.length >0) {
+        [[_webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlString]]];
+        [self performSelector:@selector(onFinder:) withObject:nil afterDelay:2];
+    }
+}
+
 @end
