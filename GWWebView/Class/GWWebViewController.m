@@ -8,15 +8,16 @@
 
 #import "GWWebViewController.h"
 @interface GWWebViewController()
-
+@property(nonatomic, strong) NSString *shopName;
 @end
 @implementation GWWebViewController
-
+@synthesize shopName;
 
 - (void)awakeFromNib{
     /* set ourself to the app's delegate so our
      applicationShouldTerminateAfterLastWindowClosed
      method will be called. */
+    self.shopName = @"yerenyo";
 	[NSApp setDelegate: self];
     [self initSubviews];
 }
@@ -47,28 +48,49 @@
 - (void)onSearch:(NSButton *)sender{
     [_webView stringByEvaluatingJavaScriptFromString:@"var script = document.createElement('script');"
      "script.type = 'text/javascript';"
-     "script.text = \"function myFunction() { "
+     "script.text = \"function mySearch() { "
      "var field = document.getElementsByName('q')[0];"
-     "field.value='新款女装';"
+     "field.value='复古包菱格 2013新款';"
      "document.forms[0].submit();"
      "}\";"
      "document.getElementsByTagName('head')[0].appendChild(script);"];
-    [_webView stringByEvaluatingJavaScriptFromString:@"myFunction();"];
+    [_webView stringByEvaluatingJavaScriptFromString:@"mySearch();"];
 }
 - (void)onFinder:(NSButton *)sender{
-    
-}
-
-    
-- (void)onNextPage:(NSButton *)sender{
     [_webView stringByEvaluatingJavaScriptFromString:@"var script = document.createElement('script');"
      "script.type = 'text/javascript';"
-     "script.text = \"function myFunction1() { "
-     "var field = document.getElementsByClassName('page-next');"
-     "field[0].submit();"
+     "script.text = \"function myFinder() { "
+     "var a = document.getElementsByClassName('item-box');"
+//     "console.log(a.length);"
+     "for(var i=0;i<a.length;i++){"
+     "var shopname1 = a[i].getElementsByClassName('row')[2].getElementsByTagName('a')[0].innerHTML;"
+     "if(shopname1==console.shopName){"
+     "var shopUrl = a[i].getElementsByClassName('row')[2].getElementsByTagName('a')[0].href;"
+     "var collectUrl = a[i].getElementsByClassName('summary')[0].getElementsByTagName('a')[0].href;"
+     "if(console){"
+     "console.findershop(collectUrl);"
+     "console.log(collectUrl);"
+     "break;"
+     "}"
+     "}"
+     "}"
      "}\";"
      "document.getElementsByTagName('head')[0].appendChild(script);"];
-    [_webView stringByEvaluatingJavaScriptFromString:@"myFunction1();"];
+    [_webView stringByEvaluatingJavaScriptFromString:@"myFinder();"];
+}
+
+- (void)onNextPage:(NSButton *)sender{
+    [_webView stringByEvaluatingJavaScriptFromString:@"var script = document.createElement('script');"
+    "script.type = 'text/javascript';"
+    "script.text = \"function myNextPage() { "
+    "var field = document.getElementsByClassName('page-next');"
+//    "if(console){"
+//    "console.log(field[0].href);"
+//    "console.nextPage(field[0].href);"
+//    "}"
+    "}\";"
+    "document.getElementsByTagName('head')[0].appendChild(script);"];
+    [_webView stringByEvaluatingJavaScriptFromString:@"myNextPage();"];
 
 }
 
@@ -85,42 +107,44 @@
 #pragma mark - webkit 方法用于js 回调oc方法
 //用于js调用oc方法时判断
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)selector {
-//    if (selector == @selector(doOutputToLog:)
-//        || selector == @selector(changeJavaScriptText:)
-//        || selector == @selector(reportSharedValue)) {
-//        return NO;
-//    }
+    if (selector == @selector(nextpage:)){
+        return NO;
+    }else if (selector == @selector(weblog:)){
+        return NO;
+    }else if (selector == @selector(finderShopUrl:)){
+        return NO;
+    }
     return YES;
 }
 //用于js调用oc属性时判断
 + (BOOL)isKeyExcludedFromWebScript:(const char *)property {
-	NSLog(@"%@ received %@ for '%s'", self, NSStringFromSelector(_cmd), property);
-	if (strcmp(property, "sharedValue") == 0) {
+	if (strcmp(property, "shopName") == 0) {
         return NO;
     }
     return YES;
 }
 //绑定oc方法与js调用oc对象方法名
 + (NSString *) webScriptNameForSelector:(SEL)sel {
-//    if (sel == @selector(doOutputToLog:)) {
-		return @"log";
-//    } else if (sel == @selector(changeJavaScriptText:)) {
-		return @"setscript";
-//	} else {
+    if (sel == @selector(nextpage:)) {
+		return @"nextPage";
+    }
+    else if(sel == @selector(finderShopUrl:)) {
+        return @"findershop";
+    }
+    else if(sel == @selector(weblog:)) {
+        return @"log";
+    }else{
 		return nil;
-//	}
+	}
 }
 
 
 //webview load成后 才可以调用 js
 - (void)webView:(WebView *)webView windowScriptObjectAvailable:(WebScriptObject *)windowScriptObject {
-	NSLog(@"%@ received %@", self, NSStringFromSelector(_cmd));
-    
     /* here we'll add our object to the window object as an object named
      'console'.  We can use this object in JavaScript by referencing the 'console'
      property of the 'window' object.   */
     [windowScriptObject setValue:self forKey:@"console"];
-    
 }
 
 /* sent to the WebView's ui delegate when alert() is called in JavaScript.
@@ -129,7 +153,7 @@
  displays an alert that presents the message to the user.
  */
 - (void)webView:(WebView *)sender runJavaScriptAlertPanelWithMessage:(NSString *)message {
-	NSLog(@"%@ received %@ with '%@'", self, NSStringFromSelector(_cmd), message);
+//	NSLog(@"%@ received %@ with '%@'", self, NSStringFromSelector(_cmd), message);
 }
 
 #pragma mark - js调用 oc方法
@@ -139,5 +163,12 @@
         [self performSelector:@selector(onFinder:) withObject:nil afterDelay:2];
     }
 }
-
+- (void)finderShopUrl:(NSString *)shopUrl{
+    if (shopUrl && shopUrl.length >0) {
+        [[_webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:shopUrl]]];
+    }
+}
+- (void)weblog:(NSString *)message{
+    NSLog(@"message:%@", message);
+}
 @end
