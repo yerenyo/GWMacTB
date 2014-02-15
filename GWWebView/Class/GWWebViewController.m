@@ -5,9 +5,10 @@
 //  Created by 115 on 13-12-30.
 //  Copyright (c) 2013年 xiaoye. All rights reserved.
 //
-
+#import <Cocoa/Cocoa.h>
 #import "GWWebViewController.h"
-#import <Carbon/Carbon.h>
+
+
 @interface GWWebViewController()
 @property(nonatomic, strong) NSString *shopName;
 @end
@@ -35,6 +36,7 @@
     [_webView setFrameLoadDelegate:self];
 	[_webView setUIDelegate: self];
 	[_webView setResourceLoadDelegate: self];
+    [_webView setPolicyDelegate:self];
 	[[_webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.taobao.com"]]];
     [_sourchBtn setTarget:self];
     [_sourchBtn setAction:@selector(onSearch:)];
@@ -72,13 +74,13 @@
                  "if(shopname1==console.shopName){"
                      "var shopUrl = a[i].getElementsByClassName('row')[2].getElementsByTagName('a')[0].href;"
                      //用js取坐标
-                     "var collectUrl = a[i].getElementsByClassName('summary')[0].getElementsByTagName('a')[0];"
+                     "var collectUrl = a[i].getElementsByClassName('summary')[0];"
                      "var left = collectUrl.getBoundingClientRect().left;"
                      "var top = collectUrl.getBoundingClientRect().top;"
                      "var right = collectUrl.getBoundingClientRect().right;"
                      "var bottom = collectUrl.getBoundingClientRect().bottom;"
                      "if(console){"
-                         "console.log(left+','+top+','+right+','+bottom);"
+                         "console.findershop(left+','+top+','+right+','+bottom);"
                      "}"//ifend
                      "return;"
                  "}"//ifend
@@ -115,28 +117,28 @@
 //        [self simulateMouseEvent: kCGEventLeftMouseUp];
 //    }];
 }
-bool wasCapsLockDown;
-- (void)beginEventMonitoring
-{
-    // Determines whether the caps lock key was initially down before we started listening for events
-    wasCapsLockDown = CGEventSourceKeyState(kCGEventSourceStateHIDSystemState, kVK_CapsLock);
-    
-    [NSEvent addGlobalMonitorForEventsMatchingMask:(NSFlagsChangedMask) handler: ^(NSEvent *event)
-     {
-         // Determines whether the caps lock key was pressed and posts a mouse down or mouse up event depending on its state
-         bool isCapsLockDown = [event modifierFlags] & NSAlphaShiftKeyMask;
-         if (isCapsLockDown && !wasCapsLockDown)
-         {
-             // Send a left mouse press event
-             wasCapsLockDown = true;
-         }
-         else if (wasCapsLockDown)
-         {
-             // Send a left mouse release event
-             wasCapsLockDown = false;
-         }
-     }];
-}
+//bool wasCapsLockDown;
+//- (void)beginEventMonitoring
+//{
+//    // Determines whether the caps lock key was initially down before we started listening for events
+//    wasCapsLockDown = CGEventSourceKeyState(kCGEventSourceStateHIDSystemState, kVK_CapsLock);
+//    
+//    [NSEvent addGlobalMonitorForEventsMatchingMask:(NSFlagsChangedMask) handler: ^(NSEvent *event)
+//     {
+//         // Determines whether the caps lock key was pressed and posts a mouse down or mouse up event depending on its state
+//         bool isCapsLockDown = [event modifierFlags] & NSAlphaShiftKeyMask;
+//         if (isCapsLockDown && !wasCapsLockDown)
+//         {
+//             // Send a left mouse press event
+//             wasCapsLockDown = true;
+//         }
+//         else if (wasCapsLockDown)
+//         {
+//             // Send a left mouse release event
+//             wasCapsLockDown = false;
+//         }
+//     }];
+//}
 
 - (void)simulateMouseEvent:(CGEventType)eventType
 {
@@ -190,6 +192,39 @@ bool wasCapsLockDown;
 		return nil;
 	}
 }
+- (void)webView:(WebView *)sender didReceiveServerRedirectForProvisionalLoadForFrame:(WebFrame *)frame{
+    
+}
+- (void)webView:(WebView *)sender willPerformClientRedirectToURL:(NSURL *)URL delay:(NSTimeInterval)seconds fireDate:(NSDate *)date forFrame:(WebFrame *)frame{
+    
+}
+
+
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request
+          frame:(WebFrame *)frame
+decisionListener:(id<WebPolicyDecisionListener>)listener
+{
+    if (WebNavigationTypeLinkClicked == [[actionInformation objectForKey:WebActionNavigationTypeKey] intValue])
+    {
+        // link was clicked do something with it...
+    }
+    [listener use]; // Say for webview to do it work...
+}
+
+
+-(void)webView:(WebView *)webView decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
+       request:(NSURLRequest *)request
+  newFrameName:(NSString *)frameName
+decisionListener:(id <WebPolicyDecisionListener>)listener
+{
+    if (WebNavigationTypeLinkClicked == [[actionInformation objectForKey:WebActionNavigationTypeKey] intValue])
+    {
+        // link was clicked and webview want to open it in new window do something with it...
+        [[_webView mainFrame] loadRequest:request];
+    }
+    [listener use]; // ignore webview default implementation...
+}
 
 
 //webview load成后 才可以调用 js
@@ -216,10 +251,29 @@ bool wasCapsLockDown;
 //        [self performSelector:@selector(onFinder:) withObject:nil afterDelay:2];
     }
 }
+//- (void)finderShopUrl:(NSString *)shopUrl{
+//    if (shopUrl && shopUrl.length >0) {
+//        [[_webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:shopUrl]]];
+//    }
+//}
 - (void)finderShopUrl:(NSString *)shopUrl{
-    if (shopUrl && shopUrl.length >0) {
-        [[_webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:shopUrl]]];
-    }
+    NSArray *rect = [shopUrl componentsSeparatedByString:@","];
+    CGFloat left = [rect[0] floatValue];
+    CGFloat top = [rect[1] floatValue];
+    CGFloat right = [rect[2] floatValue];
+    CGFloat bottom = [rect[3] floatValue];
+    CGRect rectFrame = CGRectMake(left, top, right-left, bottom-top);
+//    NSTextField *textField = [[NSTextField alloc] initWithFrame:rectFrame];
+//    textField.backgroundColor = [NSColor redColor];
+    NSScrollView *scrollView = [[[[self.webView mainFrame] frameView] documentView] enclosingScrollView];
+//    [scrollView addSubview:textField];
+    CGPoint point = CGPointMake(left+rectFrame.size.width/2.0, top+rectFrame.size.height/2.0);
+    point = [self.webView convertPoint:point fromView:scrollView];
+    NSEvent *event = [NSEvent mouseEventWithType:NSLeftMouseDown location:point modifierFlags:0 timestamp:1 windowNumber:[scrollView window].windowNumber context:nil eventNumber:0 clickCount:1 pressure:0];
+    [[self.webView window] postEvent:event atStart:NO];
+    [NSThread sleepForTimeInterval:0.5];
+    NSEvent *event1 = [NSEvent mouseEventWithType:NSLeftMouseUp location:point modifierFlags:0 timestamp:1 windowNumber:[self.webView window].windowNumber context:nil eventNumber:0 clickCount:1 pressure:0];
+    [[self.webView window] postEvent:event1 atStart:NO];
 }
 - (void)weblog:(NSString *)message{
     NSLog(@"message:%@", message);
