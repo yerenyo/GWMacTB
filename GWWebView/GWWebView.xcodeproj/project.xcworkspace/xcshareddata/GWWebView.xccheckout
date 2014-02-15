@@ -12,6 +12,8 @@
 	<dict>
 		<key>90503E12-3666-4810-88BF-3C1B44B991B5</key>
 		<string>https://github.com/yerenyo/GWMacTB.git</string>
+		<key>F48BB3E8-7791-459F-AA64-58A23C915B74</key>
+		<string>https://github.com/MugunthKumar/MKNetworkKit.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>GWWebView/GWWebView.xcodeproj/project.xcworkspace</string>
@@ -19,6 +21,8 @@
 	<dict>
 		<key>90503E12-3666-4810-88BF-3C1B44B991B5</key>
 		<string>../../..</string>
+		<key>F48BB3E8-7791-459F-AA64-58A23C915B74</key>
+		<string>../../../../MKNetworkKit</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/yerenyo/GWMacTB.git</string>
@@ -35,6 +39,14 @@
 			<string>90503E12-3666-4810-88BF-3C1B44B991B5</string>
 			<key>IDESourceControlWCCName</key>
 			<string>GWMacTB</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>F48BB3E8-7791-459F-AA64-58A23C915B74</string>
+			<key>IDESourceControlWCCName</key>
+			<string>MKNetworkKit</string>
 		</dict>
 	</array>
 </dict>

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1213CAF91889470900EA89B0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1213CAF81889470900EA89B0 /* CoreGraphics.framework */; };
+		1213CAFB1889478200EA89B0 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1213CAFA1889478200EA89B0 /* Carbon.framework */; };
 		12386EF51873A63600B85751 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12386EF41873A63600B85751 /* WebKit.framework */; };
 		126F7B9718716764005D21CC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 126F7B9618716764005D21CC /* Cocoa.framework */; };
 		126F7BA118716764005D21CC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 126F7B9F18716764005D21CC /* InfoPlist.strings */; };
@@ -33,6 +35,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1213CAF81889470900EA89B0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		1213CAFA1889478200EA89B0 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		12386EF41873A63600B85751 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		126F7B9318716764005D21CC /* GWWebView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GWWebView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		126F7B9618716764005D21CC /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -62,6 +66,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1213CAFB1889478200EA89B0 /* Carbon.framework in Frameworks */,
+				1213CAF91889470900EA89B0 /* CoreGraphics.framework in Frameworks */,
 				12386EF51873A63600B85751 /* WebKit.framework in Frameworks */,
 				126F7B9718716764005D21CC /* Cocoa.framework in Frameworks */,
 			);
@@ -82,6 +88,7 @@
 		126F7B8A18716764005D21CC = {
 			isa = PBXGroup;
 			children = (
+				1272959A18AF0AF700A4DAD9 /* OtherCodeSource */,
 				126F7BCA18716819005D21CC /* Class */,
 				126F7B9C18716764005D21CC /* GWWebView */,
 				126F7BBA18716765005D21CC /* GWWebViewTests */,
@@ -102,6 +109,8 @@
 		126F7B9518716764005D21CC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1213CAFA1889478200EA89B0 /* Carbon.framework */,
+				1213CAF81889470900EA89B0 /* CoreGraphics.framework */,
 				12386EF41873A63600B85751 /* WebKit.framework */,
 				126F7B9618716764005D21CC /* Cocoa.framework */,
 				126F7BB518716765005D21CC /* XCTest.framework */,
@@ -169,6 +178,13 @@
 				126F7BCF187181AF005D21CC /* GWWebViewController.m */,
 			);
 			path = Class;
+			sourceTree = "<group>";
+		};
+		1272959A18AF0AF700A4DAD9 /* OtherCodeSource */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = OtherCodeSource;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
